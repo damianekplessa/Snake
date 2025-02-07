@@ -19,6 +19,7 @@ namespace Snake
     {
         DispatcherTimer gameTimer = new DispatcherTimer();
         private List<Rectangle> snake;
+        private Rectangle food;
         int snakeSize = 32;
         int score = 0;
         int directionX = 1;
@@ -53,14 +54,20 @@ namespace Snake
             GameCanvas.Children.Add(head);
             score = 0;
 
-            Canvas.SetLeft(head, 100);
-            Canvas.SetTop(head, 100);
+            Canvas.SetLeft(head, 324);
+            Canvas.SetTop(head, 32);
 
-            Rectangle food = CreateFood();
+
+            food = CreateFood();     
             GameCanvas.Children.Add(food);
+            Canvas.SetLeft(food, 388);
+            Canvas.SetTop(food, 32);
+
+
+
 
             gameTimer = new DispatcherTimer();
-            gameTimer.Interval = TimeSpan.FromMilliseconds(150);
+            gameTimer.Interval = TimeSpan.FromMilliseconds(300);
             gameTimer.Tick += GameLoop;
             gameTimer.Start();
         }
@@ -81,22 +88,52 @@ namespace Snake
         private void MoveSnake()
         {
             double newX = Canvas.GetLeft(snake[0]) + (directionX * snakeSize);
-            double newY = Canvas.GetRight(snake[0]) + (directionY * snakeSize);
+            double newY = Canvas.GetTop(snake[0]) + (directionY * snakeSize);
 
             Rectangle newHead = CreateRectangle(true);
             GameCanvas.Children.Add(newHead);
             Canvas.SetLeft(newHead, newX);
             Canvas.SetTop(newHead, newY);
+            
             snake.Insert(0, newHead);
 
-            GameCanvas.Children.Remove(snake[snake.Count - 1]);
-            snake.RemoveAt(snake.Count - 1);
+            if (isFoodEaten())
+            {
+                CreateFood();
+            }
+
+            else
+            {
+                GameCanvas.Children.Remove(snake[snake.Count - 1]);
+                snake.RemoveAt(snake.Count - 1);
+                GameCanvas.Children.Remove(food);
+
+
+            }
 
         }
 
         private void GameLoop(object sender, EventArgs e)
         {
             MoveSnake();
+        }
+
+        private bool isFoodEaten()
+        {
+            double snakeX = Canvas.GetLeft(snake[0]);
+            double snakeY = Canvas.GetTop(snake[0]);
+
+            double foodX = Canvas.GetLeft(food);
+            double foodY = Canvas.GetTop(food);
+
+            if (snakeX == foodX && snakeY == foodY)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
     }
